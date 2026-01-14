@@ -1,66 +1,138 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PixelBoard - Real-time Collaborative Pixel Art Studio
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+PixelBoard is a modern, web-based collaborative pixel art editor built with **Laravel 11**, **Vue.js 3**, and **Laravel Reverb** for real-time WebSocket communication. It allows teams to work together on pixel art canvases instantly, manage projects with role-based access control, and communicate via integrated team chat.
 
-## About Laravel
+##  Technology Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   **Backend**: Laravel 11 (PHP 8.2+)
+-   **Frontend**: Vue.js 3 (Composition API), Tailwind CSS
+-   **Real-time**: Laravel Reverb (WebSocket Server), Laravel Echo
+-   **Database**: MySQL 8.0
+-   **Cache/Queue**: Redis
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+##  Key Features & Core Implementation
 
-## Learning Laravel
+### 1. Real-time Pixel Editor
+The heart of the application. Allows multiple users to draw on the same canvas simultaneously.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+-   **Component**: `resources/js/Components/PixelEditor.vue`
+-   **Logic**:
+    -   Uses HTML5 `<canvas>` API for rendering.
+    -   **Tools**: Pencil, Eraser, Fill Bucket (Flood Fill algorithm), Color Picker, Shape Tools.
+    -   **Real-time Sync**:
+        -   **Frontend**: Listens to `.pixel.painted` event via Echo.
+        -   **Backend**: `CanvasController::update` triggers `PixelPainted` event.
+        -   **Optimistic UI**: Draws locally immediately, then broadcasts.
+    -   **Export**: Built-in feature to scale up (20x) and download artwork as PNG/JPG.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```php
+// App/Events/PixelPainted.php
+class PixelPainted implements ShouldBroadcastNow {
+    public function broadcastOn() {
+        return new PresenceChannel('canvas.' . $this->canvasId);
+    }
+}
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Role-Based Access Control (RBAC)
+Granular permission system to manage team security.
 
-## Laravel Sponsors
+-   **Roles**:
+    -   **Owner**: Full access (Delete project, Manage RBAC, Edit everything).
+    -   **Editor**: Create/Delete canvases, Invite members.
+    -   **Member**: Draw on canvases, Chat.
+    -   **Viewer**: Read-only access (Cannot draw, Cannot chat).
+-   **Implementation**:
+    -   **Database**: `project_users` pivot table with `role` ('owner', 'editor', 'member', 'viewer') and `status`.
+    -   **Policy**: `App/Policies/ProjectPolicy.php` enforce rules using `authorize()`.
+    -   **Middleware**: Custom logic in Controllers to check `hasRole($user, 'role')`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Real-time Team Chat
+Integrated chat for project collaboration, restricted by role.
 
-### Premium Partners
+-   **Component**: `resources/js/Components/ProjectChat.vue`
+-   **Backend**: `App/Http/Controllers/ChatController.php`
+-   **Features**:
+    -   **Live Updates**: Messages appear instantly using `ShouldBroadcastNow`.
+    -   **Security**: Viewers are blocked from sending or viewing chat history (403 Forbidden).
+    -   **UI**: Smart interface that disables input for unauthorized users.
+    -   **Axios**: Uses Axios for robust header handling (`X-Socket-ID`) to prevent self-echo.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 4. Interactive Dashboard & Navigation
+Modern UI with Shadcn-like aesthetics (Zinc/Emerald theme).
 
-## Contributing
+-   **Pages**:
+    -   **Dashboard**: Overview of working projects.
+    -   **Explore**: Public gallery of pixel art.
+    -   **Teams**: Team management interface.
+    -   **Assets**: Downloadable resources (Palettes, Tilesets).
+-   **Sidebar**: Dynamic navigation with active state highlighting.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🛠️ Setup & Installation
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Prerequisites
+-   Docker & Docker Compose
+-   Node.js & NPM
 
-## Security Vulnerabilities
+### Installation Steps
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1.  **Clone & Setup Environment**
+    ```bash
+    git clone <repo-url>
+    cd pixel-board
+    cp .env.example .env
+    ```
 
-## License
+2.  **Start Docker Containers**
+    ```bash
+    docker-compose up -d --build
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+3.  **Install Dependencies**
+    ```bash
+    docker exec -it pixel-board-app composer install
+    docker exec -it pixel-board-app php artisan key:generate
+    docker exec -it pixel-board-app php artisan migrate --seed
+    npm install
+    npm run build
+    ```
+
+4.  **Start Reverb Server (Critical for Real-time)**
+    ```bash
+    docker exec -it pixel-board-app php artisan reverb:start
+    # OR if using separate container
+    docker restart pixel-board-reverb
+    ```
+
+### Troubleshooting Real-time Issues
+If changes (drawing/chat) don't appear for other users:
+1.  Ensure `.env` has `BROADCAST_CONNECTION=reverb`.
+2.  Ensure Events implement `ShouldBroadcastNow` (to bypass database queue).
+3.  Check browser console for WebSocket connection errors.
+4.  Restart Reverb: `php artisan reverb:restart`.
+
+---
+
+## 📂 Core Directory Structure
+
+```
+├── app/
+│   ├── Events/           # Real-time events (PixelPainted, MessageSent)
+│   ├── Http/Controllers/ # Logic for Canvas, Chat, Projects
+│   ├── Models/           # Eloquent Models (Project, Canvas, Message)
+│   └── Policies/         # Authorization Rules (RBAC)
+├── resources/
+│   ├── js/
+│   │   ├── Components/   # Vue components (PixelEditor.vue, ProjectChat.vue)
+│   │   └── Pages/        # Main route pages
+│   └── views/            # Blade templates (layouts, static pages)
+└── routes/
+    ├── channels.php      # WebSocket Channel Authorization
+    └── web.php           # App Routes
+```
+
+By **Roja Fadilah** (User) & **Antigravity** (AI Assistant).

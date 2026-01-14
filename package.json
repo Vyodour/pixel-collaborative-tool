@@ -6,6 +6,7 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "@vitejs/plugin-vue": "^5.1.4",
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
@@ -14,7 +15,10 @@
         "tailwindcss": "^3.4.13",
         "vite": "^6.0.11",
         "vue": "^3.5.12",
-        "vue-router": "^4.5.0",
-        "@vitejs/plugin-vue": "^5.1.4"
+        "vue-router": "^4.5.0"
+    },
+    "dependencies": {
+        "laravel-echo": "^2.2.7",
+        "pusher-js": "^8.4.0"
     }
 }
