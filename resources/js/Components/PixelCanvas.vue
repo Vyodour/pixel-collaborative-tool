@@ -32,13 +32,11 @@ const connectionStatus = ref('Disconnected');
 onMounted(() => {
     const ctx = canvasRef.value.getContext('2d');
     
-    // Fill background
     ctx.fillStyle = props.bgColor || '#ffffff';
     ctx.fillRect(0, 0, props.width, props.height);
     
     console.log(`Canvas initialized for Project ${props.projectId}, Canvas ${props.canvasId} [${props.width}x${props.height}]`);
     
-    // TODO: Connect to Reverb
 });
 </script>
 
