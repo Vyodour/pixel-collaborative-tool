@@ -1,60 +1,64 @@
 <template>
-    <div class="min-h-screen bg-gray-900 font-pixel text-white flex items-center justify-center p-4">
+    <div class="min-h-screen bg-zinc-950 font-pixel text-white flex items-center justify-center p-4">
         <div class="w-full max-w-md">
-            <!-- Retro Title -->
-            <h1 class="text-4xl text-center mb-8 text-yellow-400 drop-shadow-[4px_4px_0_rgba(0,0,0,1)] hover:scale-105 transition-transform cursor-default" style="font-family: 'Press Start 2P', cursive;">
-                PIXEL<br>BOARD
-            </h1>
+            <!-- Brand -->
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-4 ring-1 ring-emerald-500/20 shadow-lg shadow-emerald-500/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold tracking-tight text-white">PixelBoard</h1>
+                <p class="text-zinc-400 text-sm mt-2">Sign in to your workspace</p>
+            </div>
 
-            <!-- Pixel Box -->
-            <div class="bg-gray-800 border-4 border-white p-8 shadow-[8px_8px_0_0_rgba(0,0,0,0.5)] relative">
-                <!-- Decoration Corners -->
-                <div class="absolute -top-1 -left-1 w-2 h-2 bg-gray-900"></div>
-                <div class="absolute -top-1 -right-1 w-2 h-2 bg-gray-900"></div>
-                <div class="absolute -bottom-1 -left-1 w-2 h-2 bg-gray-900"></div>
-                <div class="absolute -bottom-1 -right-1 w-2 h-2 bg-gray-900"></div>
-
-                <h2 class="text-xl mb-6 text-center text-green-400 font-vt323 text-3xl">> LOGIN_SYSTEM</h2>
-
+            <!-- Login Card -->
+            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-xl">
                 <form @submit.prevent="handleLogin" class="space-y-6">
-                    <div class="group">
-                        <label class="block text-xs mb-2 text-gray-400 font-bold tracking-wider group-hover:text-yellow-400 transition-colors">EMAIL ADDRESS</label>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Email Address</label>
                         <input 
                             v-model="form.email" 
                             type="email" 
-                            class="w-full bg-gray-900 border-2 border-gray-600 p-3 text-white focus:border-yellow-400 focus:outline-none transition-all font-vt323 text-xl hover:border-gray-400"
-                            placeholder="user@pixel.art"
+                            class="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder-zinc-600"
+                            placeholder="name@company.com"
+                            autocomplete="email"
                             required
                         >
                     </div>
 
-                    <div class="group">
-                        <label class="block text-xs mb-2 text-gray-400 font-bold tracking-wider group-hover:text-yellow-400 transition-colors">PASSWORD</label>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wider">Password</label>
+                            <a href="#" class="text-xs text-emerald-500 hover:text-emerald-400 transition-colors">Forgot password?</a>
+                        </div>
                         <input 
                             v-model="form.password" 
                             type="password" 
-                            class="w-full bg-gray-900 border-2 border-gray-600 p-3 text-white focus:border-yellow-400 focus:outline-none transition-all font-vt323 text-xl hover:border-gray-400"
-                            placeholder="********"
+                            class="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder-zinc-600"
+                            placeholder="••••••••"
+                            autocomplete="current-password"
                             required
                         >
                     </div>
 
-                    <div v-if="error" class="text-red-500 text-xs text-center font-bold animate-pulse">
-                        [ERROR]: {{ error }}
+                    <div v-if="error" class="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg text-center font-medium">
+                        {{ error }}
                     </div>
 
                     <button 
                         type="submit" 
-                        class="w-full bg-yellow-400 text-black font-bold py-3 px-4 border-b-4 border-yellow-600 hover:bg-yellow-300 hover:border-yellow-500 active:border-b-0 active:translate-y-1 active:mt-1 transition-all cursor-pointer transform hover:scale-[1.02]"
-                        style="font-family: 'Press Start 2P', cursive; font-size: 10px;"
+                        class="w-full bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-emerald-500 transition-all transform active:scale-[0.98] shadow-lg shadow-emerald-500/20"
                     >
-                        START GAME
+                        Sign In
                     </button>
                 </form>
 
-                <div class="mt-6 text-center text-xs text-gray-500">
-                    <p>NEW PLAYER?</p>
-                    <a href="/register" class="text-blue-400 hover:text-blue-300 underline decoration-2 decoration-blue-400 hover:decoration-blue-300 transition-colors cursor-pointer inline-block mt-2 hover:scale-110">> CREATE ACCOUNT</a>
+                <div class="mt-8 pt-6 border-t border-zinc-800 text-center">
+                    <p class="text-sm text-zinc-500">
+                        Don't have an account? 
+                        <a href="/register" class="text-emerald-500 hover:text-emerald-400 font-medium hover:underline transition-colors">Register now</a>
+                    </p>
                 </div>
             </div>
         </div>
