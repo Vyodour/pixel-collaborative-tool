@@ -45,4 +45,31 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Projects owned by the user.
+     */
+    public function projects(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    /**
+     * Projects the user has joined as a member.
+     */
+    public function joinedProjects(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Project::class, 'project_users')
+                    ->withPivot(['role', 'status'])
+                    ->wherePivot('status', 'active')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Check if user is super admin.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->is_super_admin ?? false;
+    }
 }
